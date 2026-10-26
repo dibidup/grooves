@@ -167,6 +167,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline
   .list{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
 .lgh{font:600 12px/1.3 Poppins,system-ui,sans-serif;text-transform:uppercase;letter-spacing:.04em;opacity:.7;margin:14px 4px 4px}
+.bnote{margin:2px 2px 0;font-size:12.5px;line-height:1.4;color:var(--muted)}.bnote[hidden]{display:none}
 </style>
 <main>
   <div class="top">
@@ -10581,7 +10582,7 @@ function renderPlayer(){const {g,sub,n,sw,meter}=meta();const bars=g[5];const T0
   <div class="steps"><button data-f=".5">50%</button><button data-f=".75">75%</button><button data-f=".9">90%</button><button data-f="1">100%</button><button data-d="-4">−4</button><button data-d="4">+4</button></div></div></div></div><div class="pl-r">
   <button class="volbtn" id="volbtn">${SHOWVOL?'Hide volumes':'Adjust volumes'}</button><div class="mix chs">${[['cym','Cymbals'],['sn','Snare'],['tom','Toms'],['bd','Kick']].map(([k,l])=>chan('m',k,l,!mute[k])).join('')}${chan('mt','metro','Metronome',METRO).replace('max="1.5"','max="2.5"')}</div>
   ${noBand()?'':`<div class="bandbox"><label class="bandsw"><input type="checkbox" id="bandon" ${BANDON?'checked':''}><span><b>Play with the band</b><br><small id="bdesc" ${BANDON?'':'hidden'}>${esc(bandDesc())}</small></span></label>
-  <div class="mix chs" id="bmix" ${BANDON?'':'hidden'}>${bandButtons()}<button id="gsyn" aria-pressed="false" title="Switch guitar sound">Guitar: sampled</button></div></div>`}
+  <div class="mix chs" id="bmix" ${BANDON?'':'hidden'}>${bandButtons()}<button id="gsyn" aria-pressed="false" title="Switch guitar sound">Guitar: sampled</button></div><p class="bnote" id="bnote" ${BANDON?'':'hidden'}>Bass, piano and electric piano are recorded from real instruments. We\'re improving the guitars, organ and other band sounds: better versions will arrive automatically in a future update, at no extra cost.</p></div>`}
   <div class="opts">${isFillSec()?'<span>Loop: 3 bars of groove + the fill</span>':`<label><input type="checkbox" id="fillon" ${FILLON?'checked':''}><span>Fill every 4 bars</span></label><label><input type="checkbox" id="freeon" ${FREEON?'checked':''}><span>Your fill: bar 4 is free</span></label>`}<label><input type="checkbox" id="metro" ${METRO?'checked':''}><span>Metronome</span></label><label><input type="checkbox" id="countin" ${COUNTIN?'checked':''}><span>Count-in</span></label></div></div>`;
   $('player').innerHTML=h;drawScore(count);
   const setT=(v,f)=>{$('tempo').value=v;$('bpm').textContent=$('tempo').value;TPCT=f?+f:+$('tempo').value/g[2];if(Math.abs(TPCT-1)<.005)TPCT=1;$('pct').textContent=TPCT!==1?Math.round(TPCT*100)+'% · ':''};
@@ -10596,7 +10597,7 @@ function renderPlayer(){const {g,sub,n,sw,meter}=meta();const bars=g[5];const T0
   document.querySelectorAll('[data-mt]').forEach(b=>b.onclick=()=>$('qmet').click());$('qmet').onclick=()=>{$('metro').checked=!$('metro').checked;$('metro').dispatchEvent(new Event('change'))};$('qcin').onclick=()=>{$('countin').checked=!$('countin').checked;$('countin').dispatchEvent(new Event('change'))};
   if($('freeon'))$('freeon').onchange=e=>{FREEON=e.target.checked;if(FREEON){FILLON=false;$('fillon').checked=false}const was=playing;stop();drawScore(LV(SEC.s)<=2||/^1 ·/.test(SEC.c));if(was)play()};
   if($('fillon'))$('fillon').onchange=e=>{FILLON=e.target.checked;if(FILLON&&$('freeon')){FREEON=false;$('freeon').checked=false}const was=playing;stop();drawScore(LV(SEC.s)<=2||/^1 ·/.test(SEC.c));if(was)play()};
-  if($('bandon'))$('bandon').onchange=async e=>{BANDON=e.target.checked;$('bmix').hidden=!BANDON;$('bdesc').hidden=!BANDON;if(BANDON&&!bandLoaded){toast('Loading the band…');await loadBand();toast('Band ready')}};
+  if($('bandon'))$('bandon').onchange=async e=>{BANDON=e.target.checked;$('bmix').hidden=!BANDON;$('bdesc').hidden=!BANDON;if($('bnote'))$('bnote').hidden=!BANDON;if(BANDON&&!bandLoaded){toast('Loading the band…');await loadBand();toast('Band ready')}};
   if($('gsyn')){const g=document.getElementById('gsyn');const up=()=>{g.textContent='Guitar: '+(GSYN?'synth':'sampled');g.setAttribute('aria-pressed',GSYN)};up();g.onclick=e=>{e.stopPropagation();GSYN=!GSYN;try{localStorage.setItem('dg-gsyn',GSYN?'1':'0')}catch(e){}up()}}
   document.querySelectorAll('#bmix button[data-b]').forEach(b=>b.onclick=()=>{bmute[b.dataset.b]=!bmute[b.dataset.b];if(b.dataset.b==='mel'){MELON=!bmute.mel;try{localStorage.setItem('dg-mel',MELON?'1':'0')}catch(e){}}b.setAttribute('aria-pressed',!bmute[b.dataset.b])})}
 function bandDesc(){const A=arrangement();if(A.desc)return 'This groove: '+A.desc;return 'This groove: key of '+A.key+' · '+A.names.join(' | ')}
