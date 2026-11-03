@@ -200,6 +200,7 @@ body.focus .scorewrap>.score{align-content:center!important;height:100%}
     <label class="btn" for="cam"><svg viewBox="0 0 24 24"><path d="M4 4h5v2H6v3H4V4zm11 0h5v5h-2V6h-3V4zM4 15h2v3h3v2H4v-5zm14 3v-3h2v5h-5v-2h3zM8 8h3v3H8V8zm5 0h3v3h-3V8zm-5 5h3v3H8v-3zm5 0h3v3h-3v-3z"/></svg>Scan a code</label><button class="btn ghost" id="instbtn" hidden><svg viewBox="0 0 24 24"><path d="M11 3h2v9.6l3.3-3.3 1.4 1.4L12 16.4l-5.7-5.7 1.4-1.4 3.3 3.3V3zM4 18h16v2H4v-2z"/></svg>Install app</button>
     <input type="file" id="cam" accept="image/*" capture="environment" hidden>
   </div>
+  <div id="ratebox"></div>
   <section class="card" id="view"></section>
   <p class="note">Point your camera at the QR code next to any level in the book: its grooves are added to your library and stay on this device. The code on the page called <b>The Groove Library</b> unlocks thousands of extra grooves. Turn on <b>Play with the band</b> to add bass, keys, guitars and a melody that follow the groove.</p>
   <p class="note">Sounds: Virtuosity Drums, Black And Blue Basses, Weresax alto sax (Karoryfer), VSCO 2 CE strings, trumpet, flute and contrabass, and FreePats FSBS guitars (CC0); Salamander Grand Piano by Alexander Holm (CC BY 3.0); Wurlitzer EP200 by Greg Sullivan (CC BY 3.0); FluidR3 organ, clavinet, vibraphone, synth, nylon guitar, steel pan, accordion, jazz guitar and marimba (MIT).</p>
@@ -239,6 +240,32 @@ box.innerHTML='<details class="more"><summary><span>More books from Dibidup Musi
 box.querySelectorAll('[data-mb]').forEach(function(a){a.addEventListener('click',function(){try{gcEvt(P+': more books click '+a.dataset.mb+' '+a.href.replace(/^https:\/\/www\./,''))}catch(e){}})});
 var d=box.querySelector('details');d.addEventListener('toggle',function(){try{if(d.open)gcEvt(P+': more books open')}catch(e){}});
 })();</script>
+<script>(function(){
+// reseña en Amazon: tarjeta visible arriba (una vez; «Not now» vuelve a las 2 semanas, máx. 3) y fila fija junto a «More books»
+var ASIN='B0HP8SHVFF',ASINI='',CK='dg-codes',P='drums';
+function st(){var tz='',lang='';try{tz=Intl.DateTimeFormat().resolvedOptions().timeZone||''}catch(e){}try{lang=(navigator.languages||[navigator.language]).join(',').toLowerCase()}catch(e){}
+var TZ={'Europe/Madrid':'es','Atlantic/Canary':'es','Africa/Ceuta':'es','Europe/Berlin':'de','Europe/Vienna':'de','Europe/Zurich':'de','Europe/Busingen':'de','Europe/Paris':'fr','Europe/Brussels':'fr','Europe/Luxembourg':'fr','Europe/Monaco':'fr','Europe/Rome':'it','Europe/San_Marino':'it','Europe/Vatican':'it','Europe/London':'uk','Europe/Dublin':'uk','Europe/Amsterdam':'nl','Asia/Tokyo':'jp'};
+var s=TZ[tz];if(!s&&/^Australia\//.test(tz))s='au';if(!s&&/^America\/(Toronto|Vancouver|Edmonton|Winnipeg|Halifax|St_Johns|Regina|Montreal|Moncton|Whitehorse|Yellowknife|Iqaluit)$/.test(tz))s='ca';
+if(!s){var m=lang.match(/\b(en-gb|en-ie|es-es|de|fr-fr|it|nl-nl|ja)\b/);s=m?{'en-gb':'uk','en-ie':'uk','es-es':'es',de:'de','fr-fr':'fr',it:'it','nl-nl':'nl',ja:'jp'}[m[1]]:'us'}
+return {s:s,dom:{us:'amazon.com',uk:'amazon.co.uk',es:'amazon.es',de:'amazon.de',fr:'amazon.fr',it:'amazon.it',nl:'amazon.nl',jp:'amazon.co.jp',ca:'amazon.ca',au:'amazon.com.au'}[s]}}
+var S=st(),url='https://www.'+S.dom+'/review/create-review?asin='+((ASINI&&S.s!=='us'&&S.s!=='ca')?ASINI:ASIN);
+function ld(){var r={};try{r=JSON.parse(localStorage.getItem('dm-rate')||'{}')}catch(e){}if(!r.first){r.first=Date.now();sv(r)}return r}
+function sv(r){try{localStorage.setItem('dm-rate',JSON.stringify(r))}catch(e){}}
+function ev(t){try{gcEvt(P+': review '+t)}catch(e){}}
+var STAR='<svg class="rstar" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg><i class="rsp a"></i><i class="rsp b"></i>';
+var c=document.createElement('style');c.textContent='@keyframes rshine{0%,100%{transform:scale(1) rotate(0);filter:drop-shadow(0 0 3px #ffd34d)}50%{transform:scale(1.12) rotate(8deg);filter:drop-shadow(0 0 10px #ffd34d)}}@keyframes rtw{0%,100%{opacity:0;transform:scale(.3) rotate(0)}50%{opacity:1;transform:scale(1) rotate(45deg)}}.rs{position:relative;width:46px;height:46px;flex:none;display:grid;place-items:center}.rstar{width:40px;height:40px;fill:#ffc83d;stroke:#fff3c4;stroke-width:.8;animation:rshine 2.4s ease-in-out infinite}.rsp{position:absolute;width:9px;height:9px;background:#fff3c4;clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);animation:rtw 2.4s ease-in-out infinite}.rsp.a{top:0;right:2px;animation-delay:.3s}.rsp.b{bottom:3px;left:0;animation-delay:1.2s}#ratebox:empty{display:none}.rcard{border:1px solid var(--accent);border-radius:14px;padding:14px;background:var(--panel);display:grid;gap:12px;margin:0 0 14px}.rcard .rt{display:flex;gap:12px;align-items:flex-start}.rcard b{font:700 19px var(--display)}.rcard p{margin:3px 0 0;color:var(--muted);font-size:14px}.rcard .rb{display:flex;gap:8px;flex-wrap:wrap}.rcard .rb a{flex:1;justify-content:center;text-decoration:none;min-height:44px}.rcard .rb button{min-height:44px}.rcard .rb>*{flex:1 1 auto;white-space:nowrap;justify-content:center;text-align:center;padding-left:12px;padding-right:12px}.rrow{display:flex;gap:12px;align-items:center;margin-top:12px;border-top:1px solid var(--line);padding-top:12px;text-decoration:none;color:inherit}.rrow .rs{width:34px;height:34px}.rrow .rstar{width:28px;height:28px}.rrow span{display:grid;gap:2px}.rrow small{color:var(--muted)}';document.head.appendChild(c);
+var mb=document.getElementById('morebooks');if(mb){var a=document.createElement('a');a.className='rrow';a.href=url;a.target='_blank';a.rel='noopener';a.innerHTML='<span class="rs">'+STAR+'</span><span><b>Rate this book on Amazon</b><small>Every review helps us keep making books like this one.</small></span>';a.addEventListener('click',function(){ev('menu click')});mb.appendChild(a)}
+var r=ld(),force=/[?&]rate=1/.test(location.search),n=0;try{n=JSON.parse(localStorage.getItem(CK)||'[]').length}catch(e){}
+var due=force||(!r.done&&(n>=3||(Date.now()-r.first)/864e5>=5)&&(r.n||0)<3&&(!r.snooze||Date.now()>r.snooze));
+var box=document.getElementById('ratebox');if(!due||!box)return;
+box.innerHTML='<div class="rcard"><div class="rt"><span class="rs">'+STAR+'</span><span><b>Enjoying the book?</b><p>Every review helps us keep making books and apps like this one. Thank you, we really appreciate it!</p></span></div><div class="rb"><a class="btn" id="rgo" href="'+url+'" target="_blank" rel="noopener">Write a review</a><button class="btn ghost" id="rno">Not now</button><button class="btn ghost" id="rdid">I already did</button></div></div>';
+ev('card shown');
+function done(t){var q=ld();q.done=1;sv(q);ev(t);box.innerHTML=''}
+document.getElementById('rgo').addEventListener('click',function(){done('click')});
+document.getElementById('rdid').onclick=function(){done('already')};
+document.getElementById('rno').onclick=function(){var q=ld();q.n=(q.n||0)+1;q.snooze=Date.now()+14*864e5;sv(q);ev('not now');box.innerHTML=''};
+})();</script>
+
   <div class="foot"><div class="logo" aria-hidden="true"></div><span>© Dibidup Music</span></div>
 </main>
 <div class="toast" id="toast" hidden></div>
