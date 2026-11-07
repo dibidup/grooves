@@ -169,30 +169,6 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline
 }
 .lgh{font:600 12px/1.3 Poppins,system-ui,sans-serif;text-transform:uppercase;letter-spacing:.04em;opacity:.7;margin:14px 4px 4px}
 .bnote{margin:2px 2px 0;font-size:12.5px;line-height:1.4;color:var(--muted)}.bnote[hidden]{display:none}
-
-/* pantalla completa (modo concentración) */
-body.focus>*:not(main):not(.fbar):not(script):not(#toast){display:none!important}
-body.focus main>*:not(#view){display:none!important}
-body.focus #view>*:not(#player){display:none!important}
-body.focus #player>*:not(.pl-l){display:none!important}
-body.focus .pl-l>*:not(.scorewrap){display:none!important}
-body.focus{padding:4px 6px calc(70px + env(safe-area-inset-bottom,0px))!important}
-body.focus main{max-width:none!important;margin:0!important;padding:0!important}
-body.focus #view{padding:0!important;border:0!important;background:transparent!important}
-body.focus .pl-l{display:grid!important;height:calc(100svh - 82px)!important;grid-template-rows:minmax(0,1fr)!important}
-body.focus #player{display:block!important}
-body.focus .score svg{max-height:calc(100svh - 150px)}
-body.focus #qfull{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
-.fbar{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;align-items:center;gap:10px;padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px));background:rgba(18,17,16,.94);backdrop-filter:blur(6px)}
-.fbar button{height:48px;min-width:48px;border-radius:24px;border:1px solid rgba(255,255,255,.18);background:#2a2724;color:#fff;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:0 12px;cursor:pointer;font:600 14px var(--display,system-ui)}
-.fbar button svg{width:24px;height:24px;fill:currentColor}
-.fbar .fplay{background:var(--accent);color:var(--accent-fg);border-color:var(--accent);min-width:64px}
-.fbar .ftit{flex:1;min-width:0;color:#ddd;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-body.focus .pl-l>.scorewrap{height:100%;grid-template-rows:auto minmax(0,1fr)!important}
-body.focus .scorewrap>.score{align-content:center!important;height:100%}
-.rotnote{display:none}
-@media (orientation:portrait){body.focus .rotnote{display:block;text-align:center;color:#8f8676;font-size:13px;padding:6px 10px 10px}}
-@media (max-width:420px){.fbar .fexit span{display:none}}
 </style>
 <main>
   <div class="top">
@@ -200,72 +176,9 @@ body.focus .scorewrap>.score{align-content:center!important;height:100%}
     <label class="btn" for="cam"><svg viewBox="0 0 24 24"><path d="M4 4h5v2H6v3H4V4zm11 0h5v5h-2V6h-3V4zM4 15h2v3h3v2H4v-5zm14 3v-3h2v5h-5v-2h3zM8 8h3v3H8V8zm5 0h3v3h-3V8zm-5 5h3v3H8v-3zm5 0h3v3h-3v-3z"/></svg>Scan a code</label><button class="btn ghost" id="instbtn" hidden><svg viewBox="0 0 24 24"><path d="M11 3h2v9.6l3.3-3.3 1.4 1.4L12 16.4l-5.7-5.7 1.4-1.4 3.3 3.3V3zM4 18h16v2H4v-2z"/></svg>Install app</button>
     <input type="file" id="cam" accept="image/*" capture="environment" hidden>
   </div>
-  <div id="ratebox"></div>
   <section class="card" id="view"></section>
   <p class="note">Point your camera at the QR code next to any level in the book: its grooves are added to your library and stay on this device. The code on the page called <b>The Groove Library</b> unlocks thousands of extra grooves. Turn on <b>Play with the band</b> to add bass, keys, guitars and a melody that follow the groove.</p>
   <p class="note">Sounds: Virtuosity Drums, Black And Blue Basses, Weresax alto sax (Karoryfer), VSCO 2 CE strings, trumpet, flute and contrabass, and FreePats FSBS guitars (CC0); Salamander Grand Piano by Alexander Holm (CC BY 3.0); Wurlitzer EP200 by Greg Sullivan (CC BY 3.0); FluidR3 organ, clavinet, vibraphone, synth, nylon guitar, steel pan, accordion, jazz guitar and marimba (MIT).</p>
-  <div id="morebooks"></div>
-<script>(function(){
-const MORE_BOOKS = [
-  {id: 'drums', t: 'Drum Grooves for Every Style', d: '1,180 grooves and 152 fills in 35+ styles.', img: '61xa6mcngHL', asin: 'B0HP8SHVFF'},
-  {id: 'piano', t: 'Piano Grooves for Every Style', d: '508 patterns for both hands in 16 styles.', img: '71A6UwegwTL', asin: 'B0HPZWMLG2'},
-  {id: 'guitar', t: 'Guitar Grooves for Every Style', d: '527 guitar parts in notation and TAB, 16 styles.', img: '714mbPBKc5L', asin: 'B0HQ13N24B'},
-  {id: 'bass', t: 'Bass Grooves for Every Style', d: '523 bass lines in notation and TAB, with slap.', img: null, asin: null},
-  {id: 'read', t: 'Learn to Read Music in a Month', d: 'Read sheet music from scratch in 30 days.', img: '71qFEW194pL', asin: 'B0HP8NTHB8', asinIntl: 'B0HMX7DY9M'},
-  {id: 'harm', t: 'Teoría y armonía moderna para autodidactas', d: 'Spanish edition: harmony for self-taught musicians.', img: '61Ihk9-COfL', asin: 'B0HNP1JXXF', only: ['es']}
-];
-function amazonStore() {
-  let tz = '', lang = '';
-  try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
-  try { lang = (navigator.languages || [navigator.language]).join(',').toLowerCase(); } catch (e) {}
-  const TZ = {'Europe/Madrid': 'es', 'Atlantic/Canary': 'es', 'Africa/Ceuta': 'es', 'Europe/Berlin': 'de', 'Europe/Vienna': 'de', 'Europe/Zurich': 'de', 'Europe/Busingen': 'de',
-    'Europe/Paris': 'fr', 'Europe/Brussels': 'fr', 'Europe/Luxembourg': 'fr', 'Europe/Monaco': 'fr', 'Europe/Rome': 'it', 'Europe/San_Marino': 'it', 'Europe/Vatican': 'it',
-    'Europe/London': 'uk', 'Europe/Dublin': 'uk', 'Europe/Amsterdam': 'nl', 'Asia/Tokyo': 'jp'};
-  let s = TZ[tz];
-  if (!s && /^Australia\//.test(tz)) s = 'au';
-  if (!s && /^America\/(Toronto|Vancouver|Edmonton|Winnipeg|Halifax|St_Johns|Regina|Montreal|Moncton|Whitehorse|Yellowknife|Iqaluit)$/.test(tz)) s = 'ca';
-  if (!s) { const m = lang.match(/\b(en-gb|en-ie|es-es|de|fr-fr|it|nl-nl|ja)\b/); s = m ? {'en-gb': 'uk', 'en-ie': 'uk', 'es-es': 'es', de: 'de', 'fr-fr': 'fr', it: 'it', 'nl-nl': 'nl', ja: 'jp'}[m[1]] : 'us'; }
-  const DOM = {us: 'amazon.com', uk: 'amazon.co.uk', es: 'amazon.es', de: 'amazon.de', fr: 'amazon.fr', it: 'amazon.it', nl: 'amazon.nl', jp: 'amazon.co.jp', ca: 'amazon.ca', au: 'amazon.com.au'};
-  return {s, dom: DOM[s]};
-}
-var ME='drums',P='drums';
-function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
-var st=amazonStore(),label='Amazon.'+st.dom.slice(7);
-var items=MORE_BOOKS.filter(function(b){return b.id!==ME&&b.asin&&(!b.only||b.only.indexOf(st.s)>=0)}).map(function(b){
-  var asin=(b.asinIntl&&st.s!=='us'&&st.s!=='ca')?b.asinIntl:b.asin,url='https://www.'+st.dom+'/dp/'+asin;
-  return '<div class="mb"><a class="mbc" href="'+url+'" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true">'+(b.img?'<img src="https://m.media-amazon.com/images/I/'+b.img+'._SL240_.jpg" alt="" loading="lazy" onerror="this.remove()">':'')+'</a><div class="mbt"><b>'+esc(b.t)+'</b><span>'+esc(b.d)+'</span><a class="btn mbb" href="'+url+'" target="_blank" rel="noopener" data-mb="'+b.id+'">View on '+label+'</a></div></div>'}).join('');
-var box=document.getElementById('morebooks');if(!items||!box)return;
-var c=document.createElement('style');c.textContent='#morebooks{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:4px 16px 12px;margin:14px 0}.more summary{cursor:pointer;font-weight:700;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:44px;padding-top:8px}.more summary::-webkit-details-marker{display:none}.more summary::after{content:"+";font:400 22px var(--body);color:var(--accent)}.more[open] summary::after{content:"\u2212"}.more summary small{display:block;font-weight:400;color:var(--muted);font-size:13px}.mbl{display:grid;gap:10px;margin-top:10px}.mb{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--bg)}.mbc{flex:none;width:58px;height:75px;border-radius:3px;background:var(--cell,#2a2723);overflow:hidden}.mbc img{width:100%;height:100%;object-fit:cover;display:block}.mbt{display:grid;gap:3px;min-width:0}.mbt span{color:var(--muted);font-size:13.5px}.mbb{justify-self:start;margin-top:4px;padding:8px 14px;font-size:13px;text-decoration:none}';document.head.appendChild(c);
-box.innerHTML='<details class="more"><summary><span>More books from Dibidup Music<small>Each book comes with its own play-along app.</small></span></summary><div class="mbl">'+items+'</div></details>';
-box.querySelectorAll('[data-mb]').forEach(function(a){a.addEventListener('click',function(){try{gcEvt(P+': more books click '+a.dataset.mb+' '+a.href.replace(/^https:\/\/www\./,''))}catch(e){}})});
-var d=box.querySelector('details');d.addEventListener('toggle',function(){try{if(d.open)gcEvt(P+': more books open')}catch(e){}});
-})();</script>
-<script>(function(){
-// reseña en Amazon: tarjeta visible arriba (una vez; «Not now» vuelve a las 2 semanas, máx. 3) y fila fija junto a «More books»
-var ASIN='B0HP8SHVFF',ASINI='',CK='dg-codes',P='drums';
-function st(){var tz='',lang='';try{tz=Intl.DateTimeFormat().resolvedOptions().timeZone||''}catch(e){}try{lang=(navigator.languages||[navigator.language]).join(',').toLowerCase()}catch(e){}
-var TZ={'Europe/Madrid':'es','Atlantic/Canary':'es','Africa/Ceuta':'es','Europe/Berlin':'de','Europe/Vienna':'de','Europe/Zurich':'de','Europe/Busingen':'de','Europe/Paris':'fr','Europe/Brussels':'fr','Europe/Luxembourg':'fr','Europe/Monaco':'fr','Europe/Rome':'it','Europe/San_Marino':'it','Europe/Vatican':'it','Europe/London':'uk','Europe/Dublin':'uk','Europe/Amsterdam':'nl','Asia/Tokyo':'jp'};
-var s=TZ[tz];if(!s&&/^Australia\//.test(tz))s='au';if(!s&&/^America\/(Toronto|Vancouver|Edmonton|Winnipeg|Halifax|St_Johns|Regina|Montreal|Moncton|Whitehorse|Yellowknife|Iqaluit)$/.test(tz))s='ca';
-if(!s){var m=lang.match(/\b(en-gb|en-ie|es-es|de|fr-fr|it|nl-nl|ja)\b/);s=m?{'en-gb':'uk','en-ie':'uk','es-es':'es',de:'de','fr-fr':'fr',it:'it','nl-nl':'nl',ja:'jp'}[m[1]]:'us'}
-return {s:s,dom:{us:'amazon.com',uk:'amazon.co.uk',es:'amazon.es',de:'amazon.de',fr:'amazon.fr',it:'amazon.it',nl:'amazon.nl',jp:'amazon.co.jp',ca:'amazon.ca',au:'amazon.com.au'}[s]}}
-var S=st(),url='https://www.'+S.dom+'/review/create-review?asin='+((ASINI&&S.s!=='us'&&S.s!=='ca')?ASINI:ASIN);
-function ld(){var r={};try{r=JSON.parse(localStorage.getItem('dm-rate')||'{}')}catch(e){}if(!r.first){r.first=Date.now();sv(r)}return r}
-function sv(r){try{localStorage.setItem('dm-rate',JSON.stringify(r))}catch(e){}}
-function ev(t){try{gcEvt(P+': review '+t)}catch(e){}}
-var STAR='<svg class="rstar" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg><i class="rsp a"></i><i class="rsp b"></i>';
-var c=document.createElement('style');c.textContent='@keyframes rshine{0%,100%{transform:scale(1) rotate(0);filter:drop-shadow(0 0 3px #ffd34d)}50%{transform:scale(1.12) rotate(8deg);filter:drop-shadow(0 0 10px #ffd34d)}}@keyframes rtw{0%,100%{opacity:0;transform:scale(.3) rotate(0)}50%{opacity:1;transform:scale(1) rotate(45deg)}}.rs{position:relative;width:46px;height:46px;flex:none;display:grid;place-items:center}.rstar{width:40px;height:40px;fill:#ffc83d;stroke:#fff3c4;stroke-width:.8;animation:rshine 2.4s ease-in-out infinite}.rsp{position:absolute;width:9px;height:9px;background:#fff3c4;clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);animation:rtw 2.4s ease-in-out infinite}.rsp.a{top:0;right:2px;animation-delay:.3s}.rsp.b{bottom:3px;left:0;animation-delay:1.2s}#ratebox:empty{display:none}.rcard{border:1px solid var(--accent);border-radius:14px;padding:14px;background:var(--panel);display:grid;gap:12px;margin:0 0 14px}.rcard .rt{display:flex;gap:12px;align-items:flex-start}.rcard b{font:700 19px var(--display)}.rcard p{margin:3px 0 0;color:var(--muted);font-size:14px}.rcard .rb{display:flex;gap:8px;flex-wrap:wrap}.rcard .rb a{flex:1;justify-content:center;text-decoration:none;min-height:44px}.rcard .rb button{min-height:44px}.rcard .rb>*{flex:1 1 auto;white-space:nowrap;justify-content:center;text-align:center;padding-left:12px;padding-right:12px}.rrow{display:flex;gap:12px;align-items:center;margin-top:12px;border-top:1px solid var(--line);padding-top:12px;text-decoration:none;color:inherit}.rrow .rs{width:34px;height:34px}.rrow .rstar{width:28px;height:28px}.rrow span{display:grid;gap:2px}.rrow small{color:var(--muted)}';document.head.appendChild(c);
-var mb=document.getElementById('morebooks');if(mb){var a=document.createElement('a');a.className='rrow';a.href=url;a.target='_blank';a.rel='noopener';a.innerHTML='<span class="rs">'+STAR+'</span><span><b>Rate this book on Amazon</b><small>Every review helps us keep making books like this one.</small></span>';a.addEventListener('click',function(){ev('menu click')});mb.appendChild(a)}
-var r=ld(),force=/[?&]rate=1/.test(location.search),n=0;try{n=JSON.parse(localStorage.getItem(CK)||'[]').length}catch(e){}
-var due=force||(!r.done&&(n>=3||(Date.now()-r.first)/864e5>=5)&&(r.n||0)<3&&(!r.snooze||Date.now()>r.snooze));
-var box=document.getElementById('ratebox');if(!due||!box)return;
-box.innerHTML='<div class="rcard"><div class="rt"><span class="rs">'+STAR+'</span><span><b>Enjoying the book?</b><p>Every review helps us keep making books and apps like this one. Thank you, we really appreciate it!</p></span></div><div class="rb"><a class="btn" id="rgo" href="'+url+'" target="_blank" rel="noopener">Write a review</a><button class="btn ghost" id="rno">Not now</button><button class="btn ghost" id="rdid">I already did</button></div></div>';
-ev('card shown');
-function done(t){var q=ld();q.done=1;sv(q);ev(t);box.innerHTML=''}
-document.getElementById('rgo').addEventListener('click',function(){done('click')});
-document.getElementById('rdid').onclick=function(){done('already')};
-document.getElementById('rno').onclick=function(){var q=ld();q.n=(q.n||0)+1;q.snooze=Date.now()+14*864e5;sv(q);ev('not now');box.innerHTML=''};
-})();</script>
-
   <div class="foot"><div class="logo" aria-hidden="true"></div><span>© Dibidup Music</span></div>
 </main>
 <div class="toast" id="toast" hidden></div>
@@ -10659,32 +10572,11 @@ function setVol(p,v){VOL[p]=v;try{localStorage.setItem('dg_vol',JSON.stringify(V
 const chan=(attr,k,l,on)=>`<div class="ch"><button data-${attr}="${k}" aria-pressed="${on}">${l}</button><input type="range" class="vol" data-v="${k}" min="0" max="1.5" step="0.05" value="${VOL[k]}" aria-label="${l} volume"></div>`;
 function meta(){const g=SEC.g[GI];const meter=g[3]||SEC.m;const MI=NOTE.meterInfo(meter);const sub=MI.grid===16?4:3;const spb=MI.grid===16?(MI.sig.endsWith('/8')?2:4):3;
   const sw=(MI.n===16&&MI.grid===16)?(((SEC.f==='swing16'&&g[4]!==-1)||g[4]===16)?16:(g[4]===8?8:0)):0;const gs=[];let a=0;for(const x of MI.groups){gs.push(a);a+=x}return {g,meter,sub,n:MI.n,sw,spb,gs}}
-
-// pantalla completa: solo la partitura y una barra flotante (como en las apps de piano, bajo y guitarra)
-function setFocus(on){document.body.classList.toggle('focus',on);
-  try{if(on&&document.documentElement.requestFullscreen&&!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});
-    if(!on&&document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen().catch(()=>{})}catch(e){}
-  document.querySelectorAll('body > .fbar').forEach(x=>x.remove());if(on)buildFbar();
-  setTimeout(()=>{if($('score'))drawScore(LV(SEC.s)<=2||/^1 ·/.test(SEC.c));if($('player'))$('player').scrollIntoView({block:'start'})},120)}
-function buildFbar(){document.querySelectorAll('body > .fbar').forEach(x=>x.remove());
-  const fb=document.createElement('div');fb.className='fbar';
-  fb.innerHTML='<button class="fprev" aria-label="Previous groove"><svg viewBox="0 0 24 24"><path d="M15.4 5.4 14 4l-8 8 8 8 1.4-1.4L8.8 12z"/></svg></button><button class="fplay" aria-label="Play"></button><button class="fnext" aria-label="Next groove"><svg viewBox="0 0 24 24"><path d="M8.6 5.4 10 4l8 8-8 8-1.4-1.4 6.6-6.6z"/></svg></button><span class="ftit"></span><button class="fexit" aria-label="Exit full screen"><svg viewBox="0 0 24 24"><path d="M10 4v6H4V8h4V4zm4 0h2v4h4v2h-6zM4 14h6v6H8v-4H4zm10 0h6v2h-4v4h-2z"/></svg><span>Controls</span></button>';
-  document.body.appendChild(fb);
-  fb.querySelector('.fplay').onclick=()=>{$('play')&&$('play').click();syncFbar()};
-  fb.querySelector('.fprev').onclick=()=>{$('gprev')&&$('gprev').click();syncFbar()};
-  fb.querySelector('.fnext').onclick=()=>{$('gnext')&&$('gnext').click();syncFbar()};
-  fb.querySelector('.fexit').onclick=()=>setFocus(false);syncFbar()}
-function syncFbar(){const b=document.querySelector('body > .fbar .fplay');if(!b)return;
-  b.innerHTML=playing?'<svg viewBox="0 0 24 24"><path d="M6.5 5h4v14h-4zM13.5 5h4v14h-4z"/></svg>':'<svg viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5z"/></svg>';
-  const t=document.querySelector('body > .fbar .ftit');if(t&&SEC&&SEC.g[GI])t.textContent=SEC.g[GI][0]+' '+SEC.g[GI][1]}
-document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&document.body.classList.contains('focus'))setFocus(false)});
-setInterval(()=>{syncFbar();if(document.body.classList.contains('focus')&&!$('player'))setFocus(false)},300);
 function renderPlayer(){const {g,sub,n,sw,meter}=meta();const bars=g[5];const T0=Math.max(TMIN,Math.min(TMAX,Math.round(g[2]*TPCT)));
   const count=LV(SEC.s)<=2||/^1 ·/.test(SEC.c);
   let h='<div class="pl-l"><div class="scorewrap"><div class="qbtns">'+
     '<button id="qmet" aria-pressed="'+METRO+'" title="Metronome" aria-label="Metronome"><svg viewBox="0 0 24 24"><path d="M9.2 2h5.6l4.6 18.5c.2.8-.4 1.5-1.2 1.5H5.8c-.8 0-1.4-.7-1.2-1.5zM10.6 4l-3.3 14h9.4l-1.2-5-3.6 3.3-1.1-1.1 4.2-3.9L13.4 4z"/></svg></button>'+
-    '<button id="qcin" aria-pressed="'+COUNTIN+'" title="Count-in" aria-label="Count-in"><b>1234</b></button>'+
-    '<button id="qfull" title="Full screen" aria-label="Full screen"><svg viewBox="0 0 24 24"><path d="M4 4h6v2H6v4H4zm10 0h6v6h-2V6h-4zM4 14h2v4h4v2H4zm14 0h2v6h-6v-2h4z"/></svg></button></div><div class="score" id="score"></div><p class="rotnote">Turn your phone sideways for a bigger score</p></div>';
+    '<button id="qcin" aria-pressed="'+COUNTIN+'" title="Count-in" aria-label="Count-in"><b>1234</b></button></div><div class="score" id="score"></div></div>';
   h+=`<div class="transport"><button id="play" aria-label="Play"><svg viewBox="0 0 24 24" id="picon"><path d="M7 4.5v15l13-7.5z"/></svg></button>
   <div style="display:grid;gap:4px;min-width:0"><div class="gnav"><span class="gt"><span class="n">${esc(g[0])}</span> ${esc(g[1])}</span><button id="gprev" aria-label="Previous groove">‹ Previous</button><button id="gnext" aria-label="Next groove">Next ›</button></div><div><span class="bpm"><span id="bpm">${T0}</span> <small><span id="pct">${TPCT!==1?Math.round(TPCT*100)+"% · ":""}</span>bpm${meter==='12/8'?(SEC&&SEC.e==='uk'?' (dotted crotchet)':' (dotted quarter)'):(/^\d+\/8/.test(meter)?(SEC&&SEC.e==='uk'?' (quaver)':' (eighth note)'):'')}${sw?' · swing':''}</small></span></div>
   <input type="range" id="tempo" min="${TMIN}" max="${TMAX}" value="${T0}" aria-label="Tempo">
@@ -10703,7 +10595,7 @@ function renderPlayer(){const {g,sub,n,sw,meter}=meta();const bars=g[5];const T0
   $('volbtn').onclick=()=>{SHOWVOL=!SHOWVOL;document.body.classList.toggle('showvol',SHOWVOL);$('volbtn').textContent=SHOWVOL?'Hide volumes':'Adjust volumes';try{localStorage.setItem('dg-vol',SHOWVOL?'1':'0')}catch(e){}};document.body.classList.toggle('showvol',SHOWVOL);
   const gmove=d=>{const was=playing;stop();GI=(GI+d+SEC.g.length)%SEC.g.length;renderSection();if(was)play()};$('gprev').onclick=()=>gmove(-1);$('gnext').onclick=()=>gmove(1);
   $('metro').onchange=e=>{METRO=e.target.checked;saveOpts();$('qmet').setAttribute('aria-pressed',METRO);document.querySelectorAll('[data-mt]').forEach(b=>b.setAttribute('aria-pressed',METRO))};$('countin').onchange=e=>{COUNTIN=e.target.checked;saveOpts();$('qcin').setAttribute('aria-pressed',COUNTIN)};
-  document.querySelectorAll('[data-mt]').forEach(b=>b.onclick=()=>$('qmet').click());$('qmet').onclick=()=>{$('metro').checked=!$('metro').checked;$('metro').dispatchEvent(new Event('change'))};$('qcin').onclick=()=>{$('countin').checked=!$('countin').checked;$('countin').dispatchEvent(new Event('change'))};$('qfull').onclick=()=>setFocus(!document.body.classList.contains('focus'));if(document.body.classList.contains('focus'))buildFbar();
+  document.querySelectorAll('[data-mt]').forEach(b=>b.onclick=()=>$('qmet').click());$('qmet').onclick=()=>{$('metro').checked=!$('metro').checked;$('metro').dispatchEvent(new Event('change'))};$('qcin').onclick=()=>{$('countin').checked=!$('countin').checked;$('countin').dispatchEvent(new Event('change'))};
   if($('freeon'))$('freeon').onchange=e=>{FREEON=e.target.checked;if(FREEON){FILLON=false;$('fillon').checked=false}const was=playing;stop();drawScore(LV(SEC.s)<=2||/^1 ·/.test(SEC.c));if(was)play()};
   if($('fillon'))$('fillon').onchange=e=>{FILLON=e.target.checked;if(FILLON&&$('freeon')){FREEON=false;$('freeon').checked=false}const was=playing;stop();drawScore(LV(SEC.s)<=2||/^1 ·/.test(SEC.c));if(was)play()};
   if($('bandon'))$('bandon').onchange=async e=>{BANDON=e.target.checked;$('bmix').hidden=!BANDON;$('bdesc').hidden=!BANDON;if($('bnote'))$('bnote').hidden=!BANDON;if(BANDON&&!bandLoaded){toast('Loading the band…');await loadBand();toast('Band ready')}};
@@ -11879,6 +11771,93 @@ function infoDlg(title,html){const d=document.createElement('div');d.id='instdlg
     const d=document.createElement('div');d.id='instdlg';d.innerHTML=`<div><h3>Install Drum Grooves</h3>${ios?'<ol><li>Tap the <b>Share</b> button (the square with an arrow) in Safari.</li><li>Choose <b>Add to Home Screen</b>.</li><li>Tap <b>Add</b>. The app appears on your home screen.</li></ol><p class="muted"><b>Important on iPhone and iPad:</b> once installed, open the app and scan the book’s codes with its <b>Scan a code</b> button. Codes scanned with the iPhone camera open in Safari, not in the installed app.</p>':'<ol><li>In Safari, open the <b>File</b> menu (or the Share button).</li><li>Choose <b>Add to Dock</b>.</li></ol>'}<button class="btn" id="instok">OK</button></div>`;
     document.body.appendChild(d);d.onclick=e=>{if(e.target===d||e.target.id==='instok')d.remove()}}})();
 home();refreshCodes().then(()=>{const h=normCode(location.hash.slice(1)?location.href:'');if(/^DG2:/.test(h)){try{history.replaceState(null,'',location.pathname)}catch(e){}loadText(h)}});
+</script>
+<script>
+window.CAMSCAN_CFG = {onCode: async t => { try { await handleCode(t); } catch (e) { toast('That code is not from the book.'); } }};
+
+// ---------------- escáner con la cámara del ordenador ----------------
+// En móvil y tableta, «Scan a code» abre la cámara del sistema (foto) como siempre.
+// En ordenador abre la webcam en directo y lee el código en cuanto aparece; si no hay
+// cámara o se deniega el permiso, ofrece elegir una foto del código.
+(function () {
+  const CFG = window.CAMSCAN_CFG || {};
+  const ua = navigator.userAgent || '';
+  const phone = /Android|iPhone|iPad|iPod|Mobile/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const can = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) && typeof jsQR === 'function';
+  if (phone || !can) return;
+  const fileInput = () => document.getElementById(CFG.input || 'cam');
+  let ov = null, stream = null, raf = 0, busy = false;
+  function css() {
+    if (document.getElementById('cs-css')) return;
+    const s = document.createElement('style'); s.id = 'cs-css';
+    s.textContent = '#cs-ov{position:fixed;inset:0;z-index:9999;background:rgba(10,12,16,.92);display:flex;align-items:center;justify-content:center;padding:16px;font-family:inherit}' +
+      '#cs-box{background:#fff;color:#1a1d24;border-radius:14px;max-width:560px;width:100%;padding:18px;box-shadow:0 10px 40px rgba(0,0,0,.4);text-align:center}' +
+      '#cs-box h2{margin:0 0 6px;font-size:20px}#cs-box p{margin:6px 0 12px;font-size:15px;line-height:1.4;color:#3a3f4a}' +
+      '#cs-vw{position:relative;border-radius:10px;overflow:hidden;background:#000;aspect-ratio:4/3}' +
+      '#cs-vw video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);display:block}' +
+      '#cs-vw i{position:absolute;inset:18%;border:3px solid rgba(255,255,255,.9);border-radius:12px;box-shadow:0 0 0 999px rgba(0,0,0,.25)}' +
+      '#cs-st{min-height:20px;font-size:14px;margin:10px 0 4px;color:#3a3f4a}' +
+      '#cs-bt{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:8px}' +
+      '#cs-bt button{font:inherit;font-size:15px;padding:10px 16px;border-radius:10px;border:1px solid #c9ced8;background:#f3f5f8;color:#1a1d24;cursor:pointer}' +
+      '#cs-bt button.pri{background:#1a1d24;color:#fff;border-color:#1a1d24}';
+    document.head.appendChild(s);
+  }
+  function close() {
+    cancelAnimationFrame(raf); raf = 0;
+    if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+    if (ov) { ov.remove(); ov = null; }
+  }
+  function photo() { close(); const i = fileInput(); if (i) i.click(); }
+  function status(t) { const e = document.getElementById('cs-st'); if (e) e.textContent = t; }
+  async function open() {
+    if (ov) return; css();
+    ov = document.createElement('div'); ov.id = 'cs-ov';
+    ov.innerHTML = '<div id="cs-box" role="dialog" aria-label="Scan a code"><h2>Scan a code</h2>' +
+      '<p>Hold the book in front of your computer’s camera, with the code inside the frame. Keep it still for a moment.</p>' +
+      '<div id="cs-vw"><video playsinline muted></video><i></i></div><div id="cs-st">Starting the camera…</div>' +
+      '<div id="cs-bt"><button type="button" data-a="photo">Use a photo of the code</button><button type="button" class="pri" data-a="close">Cancel</button></div></div>';
+    document.body.appendChild(ov);
+    ov.addEventListener('click', e => { const a = e.target.closest('button') && e.target.closest('button').dataset.a; if (a === 'close') close(); else if (a === 'photo') photo(); else if (e.target === ov) close(); });
+    document.addEventListener('keydown', function esc(e) { if (e.key === 'Escape') { close(); document.removeEventListener('keydown', esc); } });
+    const v = ov.querySelector('video');
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({audio: false, video: {width: {ideal: 1920}, height: {ideal: 1080}, facingMode: 'user'}});
+    } catch (e) {
+      status(e && e.name === 'NotAllowedError' ? 'The camera is blocked. Allow it in your browser (the camera icon in the address bar), or use a photo of the code.' : 'No camera was found on this computer. You can use a photo of the code instead.');
+      const vw = document.getElementById('cs-vw'); if (vw) vw.style.display = 'none'; return;
+    }
+    if (!ov) { stream.getTracks().forEach(t => t.stop()); stream = null; return; }
+    v.srcObject = stream; try { await v.play(); } catch (e) {}
+    status('Looking for the code…');
+    const cv = document.createElement('canvas'), cx = cv.getContext('2d', {willReadFrequently: true});
+    let last = 0, n = 0;
+    const tick = async t => {
+      if (!ov) return; raf = requestAnimationFrame(tick);
+      if (busy || t - last < 120 || !v.videoWidth) return; last = t; n++;
+      const W = v.videoWidth, H = v.videoHeight;
+      // tres pasadas alternas: marco completo, centro ampliado y centro más ampliado
+      // (la webcam da poco detalle: ampliar el centro suaviza el ruido y agranda los módulos del código)
+      const P = [[0, 1, 1280], [0.2, 0.6, 1400], [0.3, 0.4, 1200]][n % 3];
+      const sx = W * P[0], sy = H * P[0], sw = W * P[1], sh = H * P[1];
+      const k = P[2] / Math.max(sw, sh); cv.width = Math.round(sw * k); cv.height = Math.round(sh * k);
+      cx.imageSmoothingEnabled = true; cx.imageSmoothingQuality = 'high';
+      cx.drawImage(v, sx, sy, sw, sh, 0, 0, cv.width, cv.height);
+      let r = null; try { r = jsQR(cx.getImageData(0, 0, cv.width, cv.height).data, cv.width, cv.height, {inversionAttempts: 'dontInvert'}); } catch (e) {}
+      if (r && r.data) {
+        busy = true; status('Code found!');
+        const data = r.data; close();
+        try { await CFG.onCode(data); } finally { busy = false; }
+      }
+    };
+    raf = requestAnimationFrame(tick);
+  }
+  document.addEventListener('click', e => {
+    if (e.target.closest('input')) return;   // el clic que abre el selector de fotos (input dentro de la etiqueta)
+    const b = e.target.closest(CFG.trigger || 'label[for="cam"]'); if (!b) return;
+    e.preventDefault(); e.stopPropagation(); open();
+  }, true);
+  window.camScanOpen = open;
+})();
 </script>
 <script data-goatcounter="https://dibidup.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 <script>if(matchMedia('(display-mode: standalone)').matches||navigator.standalone===true)setTimeout(function(){gcEvt('drums: opened as installed app')},1500)</script>
